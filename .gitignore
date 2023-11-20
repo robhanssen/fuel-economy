@@ -47,3 +47,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# stuff to ignore mostly
+*.png
+*.RData
+*.Rdata
