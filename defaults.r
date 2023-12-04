@@ -1,5 +1,6 @@
 library(tidyverse)
 library(patchwork)
+library(RColorBrewer)
 
 theme_set(
     theme_light() +
@@ -7,7 +8,9 @@ theme_set(
         plot.title.position = "plot",
         plot.title = element_text(hjust = 0),
         panel.grid.minor = element_blank(),
-        legend.position = "none"
+        legend.position = "none",
+        plot.caption.position = "plot",
+        plot.caption = element_text(hjust = 0)
     )
 )
 
