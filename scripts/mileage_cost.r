@@ -85,3 +85,33 @@ full_g <-
 ggsave("graphs/usage_over_time.png", 
     width = 10, height = 10, 
     plot = full_g)
+
+
+miles_cost_g <-
+    fuel %>%
+    summarize(
+        miles = sum(miles),
+        cost = sum(cost),
+        costpermile = cost / miles,
+        .by = c("year", "month")
+    ) %>%
+    mutate(,
+        ym = paste0(year, "-", as.numeric(month)),
+        ym = zoo::as.yearmon(ym)
+        ) %>%
+    ggplot(
+        aes(x = ym, y = costpermile)) + 
+        geom_point() + 
+        geom_line() +
+        zoo::scale_x_yearmon() + 
+        scale_y_continuous(
+            label = scales::label_dollar(),
+            limits = c(0, NA)
+        ) + 
+        labs(x = "", y = "Average Monthly Cost per Mile ($/mile)")
+
+
+ggsave("graphs/average_mileage_cost.png", 
+    width = 7, height = 5, 
+    plot = miles_cost_g)
+
