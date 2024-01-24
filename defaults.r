@@ -31,12 +31,13 @@ construct_quarter_date <- function(year, quarter, day = 15) {
 
 annual_use_graph <- function(dat, util) {
     dat %>%
-        mutate(year = year(date)) %>%
+        mutate(year = as.integer(year(date))) %>%
         summarize(
             total = sum({{ util }}),
             .by = c("car_name", "year"),
         ) %>%
         ggplot(aes(x = year, y = total, fill = car_name)) +
+        scale_x_continuous(breaks = scales::pretty_breaks()) +
         geom_col(alpha = .8) + 
         scale_fill_manual(values = car_colors)
 }
