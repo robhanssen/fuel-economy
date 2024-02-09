@@ -48,13 +48,17 @@ ttest_mpg_comparison <- function(dat, fltr = "") {
 }
 
 ttest_g <-
-    (ttest_mpg_comparison(fuel, "2011") + 
-        labs(x = "", y = "",
-        title = "2011 Nissan Quest")
+    (ttest_mpg_comparison(fuel, "2011") +
+    labs(
+        x = "", y = "",
+        title = "2011 Nissan Quest"
+    )
     ) /
-    (ttest_mpg_comparison(fuel, "2013") + 
-        labs(x = "", y = "",
-        title = "2013 Nissan Altima")
+    (ttest_mpg_comparison(fuel, "2013") +
+    labs(
+        x = "", y = "",
+        title = "2013 Nissan Altima"
+    )
     ) +
     plot_annotation(
         title = glue::glue("T-test comparison of fuel economy comparing {year(today())} with previous years"),
@@ -64,4 +68,5 @@ ttest_g <-
 
 ggsave("graphs/ttest-comparison-mpg.png",
     width = 8, height = 8,
-    plot = ttest_g)
+    plot = ttest_g
+)
