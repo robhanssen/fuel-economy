@@ -35,7 +35,7 @@ fitdata <- altima %>%
     mutate(
         fuel_left = altima_tank_size - gallons,
         miles_left = fuel_left * mpg,
-        mpg_cat = cut(mpg, breaks = c(0, seq(20, 32, 3), 100))
+        mpg_cat = cut(mpg, breaks = c(0, 20, 25, seq(28, 32, 3), 100))
     )
 
 full_set_g <-
