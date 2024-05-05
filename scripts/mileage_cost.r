@@ -40,7 +40,7 @@ longterm_av <-
     fuel %>%
     filter(!str_detect(car_name, "2008")) %>%
     summarize(
-        mpg_avs = sum(miles)/sum(gallons),
+        mpg_avs = sum(miles) / sum(gallons),
         .by = "car_name"
     ) %>%
     pull(mpg_avs)
@@ -51,12 +51,14 @@ miles_gallon_g <-
         labels = scales::number_format(),
         breaks = seq(16, 36, 2)
     ) +
-    labs(x = "", y = "Fuel economy\n(in miles per gallon)") + 
-    geom_hline(yintercept = longterm_av, 
-            color = car_colors, 
-            linetype = 1,
-            alpha = .3,
-            linewidth = .5)
+    labs(x = "", y = "Fuel economy\n(in miles per gallon)") +
+    geom_hline(
+        yintercept = longterm_av,
+        color = car_colors,
+        linetype = 1,
+        alpha = .3,
+        linewidth = .5
+    )
 
 
 cost_gallon_g <-
@@ -82,9 +84,10 @@ full_g <-
         title = "Car stats"
     )
 
-ggsave("graphs/usage_over_time.png", 
-    width = 10, height = 10, 
-    plot = full_g)
+ggsave("graphs/usage_over_time.png",
+    width = 10, height = 10,
+    plot = full_g
+)
 
 
 miles_cost_g <-
@@ -98,20 +101,21 @@ miles_cost_g <-
     mutate(,
         ym = paste0(year, "-", as.numeric(month)),
         ym = zoo::as.yearmon(ym)
-        ) %>%
+    ) %>%
     ggplot(
-        aes(x = ym, y = costpermile)) + 
-        geom_point() + 
-        geom_line() +
-        zoo::scale_x_yearmon() + 
-        scale_y_continuous(
-            label = scales::label_dollar(),
-            limits = c(0, NA)
-        ) + 
-        labs(x = "", y = "Average Monthly Cost per Mile ($/mile)")
+        aes(x = ym, y = costpermile)
+    ) +
+    geom_point() +
+    geom_line() +
+    zoo::scale_x_yearmon() +
+    scale_y_continuous(
+        label = scales::label_dollar(),
+        limits = c(0, NA)
+    ) +
+    labs(x = "", y = "Average Monthly Cost per Mile ($/mile)")
 
 
-ggsave("graphs/average_mileage_cost.png", 
-    width = 7, height = 5, 
-    plot = miles_cost_g)
-
+ggsave("graphs/average_mileage_cost.png",
+    width = 7, height = 5,
+    plot = miles_cost_g
+)

@@ -5,13 +5,13 @@ longterm_av <-
     fuel %>%
     filter(!str_detect(car_name, "2008")) %>%
     summarize(
-        mpg_avs = sum(miles)/sum(gallons),
+        mpg_avs = sum(miles) / sum(gallons),
         .by = "car_name"
     ) %>%
     pull(mpg_avs)
 
 
-comp_g <- 
+comp_g <-
     fuel %>%
     filter(!str_detect(car_name, "2008")) %>%
     summarize(
@@ -35,14 +35,16 @@ comp_g <-
     scale_color_manual(
         values = car_colors
     ) +
-    geom_hline(yintercept = longterm_av,
-        color = car_colors, 
+    geom_hline(
+        yintercept = longterm_av,
+        color = car_colors,
         linetype = 1,
         alpha = .3,
-        linewidth = .5) +
+        linewidth = .5
+    ) +
     labs(x = "", y = "Average Annual Fuel Economy\n(in miles per gallon)")
 
-    ggsave("graphs/fueleconomy-change.png",
-        width = 6, height = 4,
-        plot = comp_g
-    )
+ggsave("graphs/fueleconomy-change.png",
+    width = 6, height = 4,
+    plot = comp_g
+)
