@@ -36,9 +36,23 @@ fuel %>%
                 e = e_cdf(t_est)
             )
 
-            # m <- nls(e ~ pexp(t_est, rate = rate0), start = list(rate0 = 0.03), data = est_cdf)
-            # m <- nls(e ~ pnorm(t_est, mean = mean0, sd = sd0), start = list(mean0 = 20, sd0 = 5), data = est_cdf)
-            m <- nls(e ~ pnorm(log(t_est + 1), mean = mean0, sd = sd0), start = list(mean0 = log(20), sd0 = .2), data = est_cdf)
+            # exponectional distribution
+            # m <- nls(
+            #     e ~ pexp(t_est, rate = rate0),
+            #     start = list(rate0 = 0.03), data = est_cdf
+            # )
+
+            # normal distribution
+            # m <- nls(
+            #     e ~ pnorm(t_est, mean = mean0, sd = sd0),
+            #     start = list(mean0 = 20, sd0 = 5), data = est_cdf
+            # )
+
+            # lognormal distribution
+            m <- nls(
+                e ~ pnorm(log(t_est + 1), mean = mean0, sd = sd0),
+                start = list(mean0 = log(20), sd0 = .2), data = est_cdf
+            )
         })
     ) %>%
     mutate(
