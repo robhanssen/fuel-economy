@@ -14,7 +14,7 @@ theme_set(
     )
 )
 
-col_fill <- "gray70"
+col_fill <- "gray40"
 
 car_colors <-
     c("2011 Nissan Quest 3.5SL" = "#36072d", "2013 Nissan Altima 2.5SV" = "#941100")
