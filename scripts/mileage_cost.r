@@ -62,7 +62,7 @@ miles_gallon_g <-
 
 
 cost_gallon_g <-
-    time_series_graph(fuel, cost_per_gallon) +
+    time_series_graph(fuel %>% mutate(car_name = last(car_name)), cost_per_gallon) +
     scale_y_continuous(
         limits = c(0, NA),
         labels = scales::dollar_format()
