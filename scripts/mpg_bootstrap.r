@@ -1,11 +1,10 @@
 library(tidyverse)
-
 load("Rdata/fuel.Rdata")
 
+n_bootstrap <- 5000
 
 fuel_new <- fuel %>%
-    filter(!str_detect(car_name, "2008"))
-
+    filter(!str_detect(car_name, "2008"), year > 2013)
 
 bootstrapping <- function(dat, n = 100) {
     max <- nrow(dat)
@@ -17,29 +16,34 @@ bootstrapping <- function(dat, n = 100) {
     })
 }
 
-n_bootstrap <- 5000
-
-means <- fuel_new %>%
-    filter(year > 2013) %>%
+real_means <- fuel_new %>%
     summarize(
-        mean = sum(miles)/sum(gallons),
+        mean = sum(miles) / sum(gallons),
         .by = car_name
     )
 
-
-fuel_new %>%
-    filter(year > 2013) %>%
+bootstraps <- fuel_new %>%
     nest(data = !c(car_name, year)) %>%
     mutate(
         mpg_dist = map(data, bootstrapping, n = n_bootstrap)
-    ) %>%
+    )
+
+mean_labels <- bootstraps %>%
+    mutate(meanse = map(mpg_dist, quantile, probs = c(.025, .5, 0.975))) %>%
+    unnest_wider(meanse) %>%
+    mutate(
+        label = glue::glue("{round(`2.5%`, digits = 1)} - {round(`97.5%`, digits = 1)}"),
+        year = factor(year)
+    )
+
+bootstraps %>%
     unnest_longer(mpg_dist) %>%
     ggplot(
         aes(x = mpg_dist, y = factor(year), fill = car_name)
     ) +
     ggridges::geom_density_ridges(alpha = .5) +
     geom_vline(
-        data = means,
+        data = real_means,
         aes(xintercept = mean, color = car_name),
         linewidth = 2, alpha = .33
     ) +
@@ -49,17 +53,22 @@ fuel_new %>%
         breaks = seq(0, 100, 2)
     ) +
     geom_label(
-        data = means,
+        data = real_means,
         aes(x = mean, label = car_name, color = car_name), y = 0.7,
         fill = "white", label.size = NA
+    ) +
+    geom_text(
+        data = mean_labels,
+        aes(x = .5 + `97.5%`, y = year, label = label), hjust = 0, vjust = -.5
     ) +
     coord_cartesian(clip = "off") +
     labs(
         x = "Bootstrapped fuel economy distribution (in miles per gallon)",
         y = NULL,
         caption = glue::glue(
-            "Distributions based on {n_bootstrap} bootstrap iterations. ",
-            "Vertical line indicates long-term average"
+            "Distributions based on {scales::number(n_bootstrap)} bootstrap iterations. ",
+            "Vertical line indicates long-term average. ",
+            "Number ranges indicate 95% expected range"
         ),
         title = "Estimated fuel economy distribution by year"
     ) +
@@ -70,6 +79,3 @@ fuel_new %>%
     )
 
 ggsave("graphs/mpg_average_bootstrap.png", width = 6, height = 8)
-
-
-?geom_label
