@@ -59,7 +59,11 @@ bootstraps %>%
     ) +
     geom_text(
         data = mean_labels,
-        aes(x = .5 + `97.5%`, y = year, label = label), hjust = 0, vjust = -.5
+        aes(
+            x = .5 + `97.5%`, y = year,
+            label = label, color = car_name
+        ),
+        hjust = 0, vjust = -.5
     ) +
     coord_cartesian(clip = "off") +
     labs(
@@ -74,7 +78,7 @@ bootstraps %>%
     ) +
     theme(
         plot.caption.position = "plot",
-        plot.caption = element_text(hjust = 0),
+        plot.caption = element_text(hjust = 0, size = 6),
         plot.title.position = "plot"
     )
 
