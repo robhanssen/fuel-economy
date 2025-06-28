@@ -1,7 +1,10 @@
 library(tidyverse)
+library(furrr)
+plan(multisession)
+
 load("Rdata/fuel.Rdata")
 
-n_bootstrap <- 5000
+n_bootstrap <- 10000
 
 fuel_new <- fuel %>%
     filter(!str_detect(car_name, "2008"), year > 2013)
@@ -25,7 +28,7 @@ real_means <- fuel_new %>%
 bootstraps <- fuel_new %>%
     nest(data = !c(car_name, year)) %>%
     mutate(
-        mpg_dist = map(data, bootstrapping, n = n_bootstrap)
+        mpg_dist = future_map(data, bootstrapping, n = n_bootstrap, .options = furrr_options(seed = TRUE))
     )
 
 mean_labels <- bootstraps %>%
