@@ -10,6 +10,7 @@ sumry <- function(dat, yr = TRUE, qrtr = TRUE) {
             miles_per_gallon = sum(miles) / sum(gallons),
             cost_per_gallon = sum(cost) / sum(gallons),
             cost_per_mile = sum(cost) / sum(miles),
+            cost_per_day = sum(cost) / sum(time_between_fuelup),
             .by = all_of(grouping)
         ) %>%
         mutate(date = as.Date(unlist(map2(year, quarter, construct_quarter_date)), origin = "1970-01-01"))
@@ -78,14 +79,22 @@ cost_mile_g <-
     labs(x = "", y = "Car cost (in $/mile)")
 
 
+cost_day_g <-
+    time_series_graph(fuel, cost_per_day) +
+    scale_y_continuous(
+        limits = c(0, NA),
+        labels = scales::dollar_format()
+    ) +
+    labs(x = "", y = "Car cost (in $/day)")
+
 full_g <-
-    miles_gallon_g / cost_gallon_g / cost_mile_g +
+    miles_gallon_g / cost_gallon_g / cost_mile_g / cost_day_g +
     plot_annotation(
         title = "Car stats"
     )
 
 ggsave("graphs/usage_over_time.png",
-    width = 10, height = 10,
+    width = 10, height = 12,
     plot = full_g
 )
 

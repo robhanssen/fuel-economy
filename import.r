@@ -20,6 +20,10 @@ fuel <-
         dayofmonth = day(date),
         dayofyear = yday(date)
     ) %>%
+    mutate(
+        time_between_fuelup = (date - lag(date)) /ddays(1),
+        .by = car_name
+    ) %>%
     filter(year >= 2013)
 
 
