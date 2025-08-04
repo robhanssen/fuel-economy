@@ -17,9 +17,24 @@ theme_set(
 load("Rdata/fuel.Rdata")
 
 
+summarize_fuel <- function(dat, var) {
+    dat %>% 
+        summarize(
+            min = min({{var}}),
+            low5 = quantile({{var}}, 0.05),
+            average = mean({{var}}, na.rm = TRUE),
+            median = quantile({{var}}, 0.50),
+            high95 = quantile({{var}}, 0.95),
+            max = max({{var}}), 
+            .by = car_name
+        )
+}
+
+
+summarize_fuel(fuel %>% filter(gallons < 20), miles)
+
 fuel %>% 
     summarize(
-        min_mpg = min(mpg),
         low5 = quantile(mpg, 0.05),
         median = quantile(mpg, 0.50),
         high95 = quantile(mpg, 0.95),
@@ -28,9 +43,11 @@ fuel %>%
     )
 
 fuel %>%
-    ggplot(aes(y = car_name, x = mpg)) + 
+    ggplot(aes(y = car_name, x = gallons)) + 
     ggridges::geom_density_ridges() +
-    scale_x_continuous(breaks = seq(10, 40, 2))
+    scale_x_continuous(
+        # breaks = seq(10, 40, 2)
+        )
 
 
 fuel %>%
