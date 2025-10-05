@@ -28,7 +28,7 @@ real_means <- fuel_new %>%
 
 
 generate_bootstraps <- function(dat, var, custom_var) {
-    bootstraps <- fuel_new %>%
+    bootstraps <- dat %>%
         nest(data = !c(car_name, {{ var }})) %>%
         mutate(
             mpg_dist = future_map(data, bootstrapping, n = n_bootstrap, .options = furrr_options(seed = TRUE))
