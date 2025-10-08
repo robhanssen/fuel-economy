@@ -32,6 +32,10 @@ summarize_fuel <- function(dat, var) {
 
 
 summarize_fuel(fuel %>% filter(gallons < 20), miles)
+summarize_fuel(fuel %>% filter(gallons < 20), gallons)
+summarize_fuel(fuel %>% filter(gallons < 20), cost)
+summarize_fuel(fuel %>% filter(gallons < 20), price)
+
 
 fuel %>% 
     summarize(
