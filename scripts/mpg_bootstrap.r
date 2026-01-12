@@ -61,7 +61,7 @@ generate_bootstraps <- function(dat, var, custom_var) {
         geom_label(
             data = real_means,
             aes(x = mean, label = car_name, color = car_name), y = 0.7,
-            fill = "white", label.size = NA
+            fill = "white", linewidth = 0
         ) +
         geom_text(
             data = mean_labels,
