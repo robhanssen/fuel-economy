@@ -1,0 +1,12 @@
+Date,Odometer,FuelConsumed,Cost,FuelEconomy,IsFillToFull,MissedFuelUp,Notes,Tags
+01/09/2013,43022,14.44,44.76,,TRUE,FALSE,Test Note,test1 test2
+02/01/2013,43319,12.88,40.06,,TRUE,FALSE,Test Note,test1 test2
+02/27/2013,43651,14.61,50.55,,TRUE,FALSE,Test Note,test1 test2
+03/15/2013,43985,13.44,45.29,,TRUE,FALSE,Test Note,test1 test2
+04/07/2013,44262,11.6,37.93,,TRUE,FALSE,Test Note,test1 test2
+04/15/2013,44587,12.45,40.09,,TRUE,FALSE,Test Note,test1 test2
+05/06/2013,44924,12.63,40.16,,TRUE,FALSE,Test Note,test1 test2
+06/06/2013,45272,13.82,42.7,,TRUE,FALSE,Test Note,test1 test2
+07/09/2013,45660,15.39,46.17,,TRUE,FALSE,Test Note,test1 test2
+08/07/2013,46043,16.4,51.82,,TRUE,FALSE,Test Note,test1 test2
+09/11/2013,46411,16.16,51.07,,TRUE,FALSE,Test Note,test1 test2
