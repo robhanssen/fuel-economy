@@ -10,7 +10,7 @@ sumry <- function(dat, yr = TRUE, qrtr = TRUE) {
             miles_per_gallon = sum(miles) / sum(gallons),
             cost_per_gallon = sum(cost) / sum(gallons),
             cost_per_mile = sum(cost) / sum(miles),
-            cost_per_day = sum(cost) / sum(time_between_fuelup),
+            cost_per_day = sum(cost) / (sum(time_between_fuelup) - length(time_between_fuelup)), # prevent double counting of days # nolint
             .by = all_of(grouping)
         ) %>%
         mutate(date = as.Date(unlist(map2(year, quarter, construct_quarter_date)), origin = "1970-01-01"))
