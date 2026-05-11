@@ -1,5 +1,6 @@
 library(tidyverse)
 library(patchwork)
+library(ggtext)
 
 theme_set(
     theme_light() +
@@ -15,21 +16,23 @@ theme_set(
 
 load("Rdata/fuel.Rdata")
 
+quantiles <- c(0, 1)
+q_len <- length(quantiles)
 
-altima_out <- boxplot(fuel$miles[str_detect(fuel$car_name, "2013")], plot = FALSE)$out
-quest_out <- boxplot(fuel$miles[str_detect(fuel$car_name, "2011")], plot = FALSE)$out
+# altima_out <- boxplot(fuel$miles[str_detect(fuel$car_name, "2013")], plot = FALSE)$out
+# quest_out <- boxplot(fuel$miles[str_detect(fuel$car_name, "2011")], plot = FALSE)$out
 
-altima_all <- fuel %>%
-    filter(str_detect(car_name, "2013")) %>%
-    mutate(outlier = miles %in% altima_out) %>% 
-    filter(!outlier)
+# altima_all <- fuel %>%
+#     filter(str_detect(car_name, "2013")) %>%
+#     mutate(outlier = miles %in% altima_out) %>%
+#     filter(!outlier)
 
-quest_all <- fuel %>%
-    filter(str_detect(car_name, "2011")) %>%
-    mutate(outlier = miles %in% quest_out) %>% 
-    filter(!outlier)
+# quest_all <- fuel %>%
+#     filter(str_detect(car_name, "2011")) %>%
+#     mutate(outlier = miles %in% quest_out) %>%
+#     filter(!outlier)
 
-fuel_alt <- bind_rows(altima_all, quest_all) 
+# fuel_alt <- bind_rows(altima_all, quest_all)
 
 fuel_alt2 <-
     fuel %>%
@@ -41,15 +44,43 @@ fuel_alt2 <-
     ) %>%
     select(-data, -outliers) %>%
     # do a normality test on filtered_data
-        mutate(
-            normality_test = map(filtered_data, ~ shapiro.test(.x$miles)),
-            p_value = map_dbl(normality_test, "p.value")
-        ) %>%
+    mutate(
+        normality_test = map(filtered_data, ~ shapiro.test(.x$miles)),
+        p_value = map_dbl(normality_test, "p.value")
+    ) %>%
     unnest(filtered_data)
+
+
+qqplot_g <-
+    fuel_alt2 %>%
+    ggplot(aes(sample = miles, color = car_name)) +
+    geom_qq() +
+    geom_qq_line() +
+    scale_color_manual(values = car_colors) +
+    geom_vline(
+        data = tibble(
+            car_name = rep(levels(fuel_alt2$car_name)[1:2], each = 4),
+            xint = rep(c(-2, 0, 1, 2), 2)
+        ),
+        mapping = aes(xintercept = xint),
+        color = "gray40",
+        linetype = rep(c(1, 2, 1, 1), 2),
+        linewidth = rep(c(2, .5, .5, 2), 2),
+        alpha = rep(c(0.05, 1, 1, 0.05), 2)
+    ) +
+    facet_wrap(~car_name, ncol = 1, scale = "free_y") +
+    labs(
+        # y = "Distance (in mile)",
+        x = "Normal distribution quantiles",
+        title = "Validation of normality"
+    ) +
+    theme(
+        axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 1)
+    )
 
 dist_g <-
     fuel_alt2 %>%
-    filter(!str_detect(car_name, "2008")) %>%
     summarize(
         av_dist_0 = quantile(miles, pnorm(0)),
         av_dist_1 = quantile(miles, pnorm(1)),
@@ -70,10 +101,24 @@ dist_g <-
     ) +
     labs(
         x = NULL, y = "Distance (in miles)",
-        title = "Distance between fuel-ups at the 84th and 50th percentiles"
+        title = "Distance between fuel-ups",
+        subtitle = glue::glue("Calculated at the {round(100*pnorm(1),0)}th (<I>z=1</I>) and {round(100*pnorm(0),0)}th percentiles (<I>z=0</I>)"
+
+        )
+    ) +
+    theme(
+        plot.subtitle = element_markdown()
     )
 
-ggsave("graphs/av_distance.png", width = 8, height = 6, plot = dist_g)
+all_plot <-
+    dist_g + qqplot_g + plot_layout(width = c(4, 3)) + 
+    plot_annotation(
+        caption = "Note: outliers were removed prior to analysis according to 1.5 IQR rule"
+    )
+
+ggsave("graphs/distance_between_fuelup.png", width = 10, height = 8, plot = all_plot)
+
+
 
 
 
