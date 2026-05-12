@@ -18,22 +18,7 @@ load("Rdata/fuel.Rdata")
 
 quantiles <- c(0, 1)
 
-# altima_out <- boxplot(fuel$miles[str_detect(fuel$car_name, "2013")], plot = FALSE)$out
-# quest_out <- boxplot(fuel$miles[str_detect(fuel$car_name, "2011")], plot = FALSE)$out
-
-# altima_all <- fuel %>%
-#     filter(str_detect(car_name, "2013")) %>%
-#     mutate(outlier = miles %in% altima_out) %>%
-#     filter(!outlier)
-
-# quest_all <- fuel %>%
-#     filter(str_detect(car_name, "2011")) %>%
-#     mutate(outlier = miles %in% quest_out) %>%
-#     filter(!outlier)
-
-# fuel_alt <- bind_rows(altima_all, quest_all)
-
-fuel_alt2 <-
+fuel_alt <-
     fuel %>%
     filter(!str_detect(car_name, "2008")) %>%
     nest(data = -car_name) %>%
@@ -51,15 +36,15 @@ fuel_alt2 <-
 
 
 qqplot_g <-
-    fuel_alt2 %>%
+    fuel_alt %>%
     ggplot(aes(sample = miles, color = car_name)) +
     geom_qq() +
     geom_qq_line() +
     scale_color_manual(values = car_colors) +
     geom_vline(
         data = tibble(
-            car_name = rep(levels(fuel_alt2$car_name)[1:2], each = 4),
-            xint = rep(c(-2, 0, 1, 2), 2)
+            car_name = rep(levels(fuel_alt$car_name)[1:2], each = 4),
+            xint = rep(c(-2, quantiles, 2), 2)
         ),
         mapping = aes(xintercept = xint),
         color = "gray40",
@@ -86,7 +71,7 @@ subtitle <- paste0(
 )
 
 dist_g <-
-    fuel_alt2 %>%
+    fuel_alt %>%
     summarize(
         av_dist_0 = quantile(miles, pnorm(quantiles[1])),
         av_dist_1 = quantile(miles, pnorm(quantiles[2])),
@@ -114,10 +99,6 @@ dist_g <-
         plot.subtitle = element_markdown()
     )
 
-quantiles
-
-
-
 all_plot <-
     dist_g + qqplot_g + plot_layout(width = c(4, 3)) +
     plot_annotation(
@@ -125,18 +106,3 @@ all_plot <-
     )
 
 ggsave("graphs/distance_between_fuelup.png", width = 10, height = 8, plot = all_plot)
-
-
-
-
-
-fuel_alt2 %>%
-    filter(!str_detect(car_name, "2008")) %>%
-    summarize(
-        av_dist_0 = quantile(miles, pnorm(0)),
-        av_dist_1 = quantile(miles, pnorm(1)),
-        .by = c(car_name, year)
-    ) %>%
-    filter(str_detect(car_name, "2011")) %>%
-    lm(av_dist_1 ~ year, data = .) %>%
-    summary()
