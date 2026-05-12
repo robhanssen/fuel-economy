@@ -17,7 +17,6 @@ theme_set(
 load("Rdata/fuel.Rdata")
 
 quantiles <- c(0, 1)
-q_len <- length(quantiles)
 
 # altima_out <- boxplot(fuel$miles[str_detect(fuel$car_name, "2013")], plot = FALSE)$out
 # quest_out <- boxplot(fuel$miles[str_detect(fuel$car_name, "2011")], plot = FALSE)$out
@@ -71,7 +70,7 @@ qqplot_g <-
     facet_wrap(~car_name, ncol = 1, scale = "free_y") +
     labs(
         # y = "Distance (in mile)",
-        x = "Normal distribution quantiles",
+        x = "Normal distribution (in z-values)",
         title = "Validation of normality"
     ) +
     theme(
@@ -79,11 +78,18 @@ qqplot_g <-
         plot.title = element_text(hjust = 1)
     )
 
+
+subtitle <- paste0(
+    "Calculated at ",
+    paste0("the ", round(100 * pnorm(quantiles), 0), "th ", "(<I>z=", quantiles, "</I>) ", collapse = " and "),
+    " percentile"
+)
+
 dist_g <-
     fuel_alt2 %>%
     summarize(
-        av_dist_0 = quantile(miles, pnorm(0)),
-        av_dist_1 = quantile(miles, pnorm(1)),
+        av_dist_0 = quantile(miles, pnorm(quantiles[1])),
+        av_dist_1 = quantile(miles, pnorm(quantiles[2])),
         .by = c(car_name, year)
     ) %>%
     ggplot(aes(x = year, y = av_dist_1, fill = car_name, color = car_name)) +
@@ -96,22 +102,24 @@ dist_g <-
     scale_color_manual(values = car_colors) +
     scale_x_continuous(breaks = seq(2010, 2030, 5)) +
     annotate(
-        geom = "text", x = c(2017, 2023), y = c(310, 460),
+        geom = "text", x = c(2017, 2023), y = c(310, 455),
         label = levels(fuel$car_name)[1:2], color = car_colors
     ) +
     labs(
         x = NULL, y = "Distance (in miles)",
         title = "Distance between fuel-ups",
-        subtitle = glue::glue("Calculated at the {round(100*pnorm(1),0)}th (<I>z=1</I>) and {round(100*pnorm(0),0)}th percentiles (<I>z=0</I>)"
-
-        )
+        subtitle = subtitle
     ) +
     theme(
         plot.subtitle = element_markdown()
     )
 
+quantiles
+
+
+
 all_plot <-
-    dist_g + qqplot_g + plot_layout(width = c(4, 3)) + 
+    dist_g + qqplot_g + plot_layout(width = c(4, 3)) +
     plot_annotation(
         caption = "Note: outliers were removed prior to analysis according to 1.5 IQR rule"
     )
