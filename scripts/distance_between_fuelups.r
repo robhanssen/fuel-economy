@@ -18,9 +18,18 @@ load("Rdata/fuel.Rdata")
 
 quantiles <- c(0, 1)
 
+car_colors_alt <- c("Nissan Quest" = "#36072d", "Nissan Altima" = "#941100")
+
+
 fuel_alt <-
     fuel %>%
     filter(!str_detect(car_name, "2008")) %>%
+    mutate(car_name = case_when(
+        str_detect(car_name, "2011") ~ "Nissan Quest",
+        str_detect(car_name, "2013") ~ "Nissan Altima",
+        TRUE ~ car_name
+    ), 
+    car_name = factor(car_name)) %>%
     nest(data = -car_name) %>%
     mutate(
         outliers = map(data, ~ boxplot(.x$miles, plot = FALSE)$out),
@@ -40,7 +49,7 @@ qqplot_g <-
     ggplot(aes(sample = miles, color = car_name)) +
     geom_qq() +
     geom_qq_line() +
-    scale_color_manual(values = car_colors) +
+    scale_color_manual(values = car_colors_alt) +
     geom_vline(
         data = tibble(
             car_name = rep(levels(fuel_alt$car_name)[1:2], each = 4),
@@ -83,12 +92,12 @@ dist_g <-
     geom_point(shape = 21, size = 3) +
     geom_point(aes(y = av_dist_0), shape = 21, size = 3, fill = "white") +
     # facet_wrap(~car_name) +
-    scale_fill_manual(values = car_colors) +
-    scale_color_manual(values = car_colors) +
+    scale_fill_manual(values = car_colors_alt) +
+    scale_color_manual(values = car_colors_alt) +
     scale_x_continuous(breaks = seq(2010, 2030, 5)) +
     annotate(
         geom = "text", x = c(2017, 2023), y = c(310, 455),
-        label = levels(fuel$car_name)[1:2], color = car_colors
+        label = levels(fuel_alt$car_name)[c(2,1)], color = car_colors_alt
     ) +
     labs(
         x = NULL, y = "Distance (in miles)",
